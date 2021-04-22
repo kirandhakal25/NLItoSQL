@@ -1,0 +1,348 @@
+/* ----------------------User code--------------------*/
+
+package src;
+import java.util.*;
+import java.util.ArrayList;
+
+   
+/* ------------Grammar symbol declarations----------- */
+   
+terminal    PLUS, MINUS, TIMES, DIVIDE, MOD, EQ, NOPRINT, PRINT, SEMI, LPAREN, RPAREN, AND, OR, LT, GT, LTE, GTE,
+            EQUAL, NOTEQUAL, INT, KIR, FLOAT, CHAR, STRING, BOOLEAN, LCURLY, RCURLY, IF, ELSE, ELSEIF, WHILE, 
+            DO,EXP, LIST, DOT;
+
+terminal String ID;
+
+
+terminal String VERB_LITERAL;
+terminal String PREPOSITION_LITERAL;
+terminal String NOUN_LITERAL;
+terminal String TABLE_LITERAL;
+terminal String ATTRIBUTE_LITERAL;
+terminal String ADJ_LITERAL;
+terminal String DET_LITERAL;
+terminal String all, the, details, of;
+
+non terminal X, Y, PP, Prep, Noun ;
+non terminal Verb verb;
+non terminal Noun noun;
+non terminal NP noun_phrase;
+non terminal NPMixed noun_phrase_mixed;
+non terminal VP verb_phrase;
+non terminal PP prepositional_phrase;
+non terminal Preposition preposition;
+non terminal Program program;
+non terminal Sentence sentence;
+non terminal Det determiner;
+non terminal Adjective adjective;
+
+//non terminal program;
+//non terminal Expr    expr, math, factor, term, logic, zerm;
+//non terminal Stmt    statement;
+//non terminal Stmt    noprint, print, list, declare, define, ifthen, ifelse, assign, while, dowhile;
+//non terminal ArrayList<Stmt>  statement_list;
+//non terminal ArrayList<ElseBlock> else_list;
+
+
+/* Precedences */
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence left AND, OR;
+   
+/* ------------Grammar rules----------- */
+
+program     ::= sentence:s
+            {:
+                  RESULT = new Program(s); :};
+
+sentence ::= verb_phrase:vp
+            {:      RESULT = new Sentence(vp); :};
+
+verb_phrase      ::= verb:v noun_phrase_mixed:np
+                 {:
+                        RESULT = new VP(v, np);
+                        System.out.println("hello from VP");
+                 :}
+                 | verb:v noun_phrase:np
+                 {:
+                        RESULT = new VP(v, np);
+                        System.out.println("hello from new new new brand new VP");
+                 :}
+
+;
+
+verb             ::= VERB_LITERAL:v
+                 {: RESULT = new Verb(v); :};
+
+
+noun_phrase_mixed ::= noun_phrase:np prepositional_phrase:pp
+                 {: RESULT = new NPMixed(np, pp); :};
+
+
+noun_phrase      ::= determiner:d noun_phrase:np
+                 {: RESULT = new NP(d, np); :}
+
+//                 |determiner:d noun:n
+//                 {: RESULT = new NP(d, n);
+//                    System.out.println(RESULT + "I am exiting the noun_phrase in cup file");
+//                 :}
+
+
+                 | adjective:a noun:n
+                 {: RESULT = new NP(a, n); :}
+
+                 | noun:n
+                 {: RESULT = new NP(n); :};
+
+
+determiner       ::= DET_LITERAL:d
+                 {: RESULT = new Det(d); :};
+
+
+adjective        ::= ADJ_LITERAL:a
+                 {: RESULT = new Adjective(a); :};
+
+
+//                 | noun_phrase:np prepositional_phrase:pp
+//                 {: System.out.println("Hello from the noun_phrase in cup file");
+//                    RESULT = new NP(np, pp); :} 
+
+//                 |ID:id
+//                 {: RESULT = new NP(id); :}
+//                 | ADJ_LITERAL:a ID:id
+//                 {: RESULT = new NP(a, id); :}
+//                 | ADJ_LITERAL:a DET_LITERAL:d ID:id
+//                 {: RESULT = new NP(a, d, id); :}
+//               | Adj:a X_Det_N:x
+//                 {: RESULT = new X_Det_N(a,x); :}
+
+prepositional_phrase ::= preposition:p noun_phrase:np
+                  {: RESULT = new PP(p, np); :}
+                  | preposition:p noun_phrase_mixed:np
+                  {: RESULT = new PP(p, np); :};
+                   
+
+preposition      ::= PREPOSITION_LITERAL:p
+                 {: RESULT = new Preposition(p); :};
+
+noun            ::= TABLE_LITERAL:t
+                {: RESULT = new Noun("table", t); :}
+                | ATTRIBUTE_LITERAL:a
+                {: RESULT = new Noun("attribute", a); :}
+                | NOUN_LITERAL:n
+                {: RESULT = new Noun(n); :};
+
+/*program   ::= expr:e {: System.out.println("Evaluation results = " + e); :};*/
+
+/*program   ::= statement:s {: s.execute(); :};*/
+
+//program     ::= statement_list:sl
+//            {:      RESULT = sl;
+/*                    System.out.println("");
+                    Memory.memory.clear();
+
+                    System.out.println("----------------- PREFIX OF THE PROGRAM -----------------");
+                    for (Stmt s : sl){
+                        s.execute_prefix();
+
+                    }
+
+                    System.out.println();
+                    System.out.println("----------------- OUTPUT OF THE PROGRAM -----------------");
+                    for (Stmt s : sl){
+                        s.execute();
+                    }
+*/
+//            :};
+/*
+statement_list  ::= statement_list:sl statement:s
+                {: 
+                    sl.add(s);
+                    RESULT = sl;
+                :}
+                | statement:s
+                {: 
+                    ArrayList<Stmt> sl;
+                    sl = new ArrayList<Stmt>();
+                    sl.add(s);
+                    RESULT = sl;
+                :};
+
+statement ::= print:p SEMI
+                {: RESULT = p; :}
+            | noprint:n SEMI
+                {: RESULT = n; :}
+            | declare:d SEMI
+                {: RESULT = d; :}
+            | define:d SEMI
+                {: RESULT = d; :}
+            | ifthen:i SEMI
+                {: RESULT = i; :}
+            | ifelse:i SEMI
+                {: RESULT = i; :}
+            | assign:a SEMI
+                {: RESULT = a; :}
+            | while:w SEMI
+                {: RESULT = w; :}
+            | dowhile:d SEMI
+                {: RESULT = d; :}
+            | list:l DOT
+                {: RESULT = l; :};
+     
+noprint ::= NOPRINT LPAREN expr:e RPAREN 
+                {: 
+                    System.out.println("Hello from NOPRINT");
+                    RESULT = Stmt.noprint(e); 
+                :}
+            | NOPRINT LPAREN RPAREN
+                {:  
+                    RESULT = Stmt.noprint();
+                :};          
+   
+print ::= PRINT expr:e {: RESULT = Stmt.print(e); :};
+
+list  ::= LIST expr:e {: RESULT = Stmt.list(e); :};
+
+declare   ::= INT ID:id
+                {: RESULT = Stmt.declare_int(id);  :}
+            | FLOAT ID:id
+                {: RESULT = Stmt.declare_float(id);  :}
+            | STRING ID:id
+                {: RESULT = Stmt.declare_string(id);  :}
+            | CHAR ID:id
+                {: RESULT = Stmt.declare_char(id);  :}
+            | BOOLEAN ID:id
+                {: RESULT = Stmt.declare_boolean(id);  :}
+            | KIR ID:id
+                {: RESULT = Stmt.declare_kir(id); :};
+
+define  ::= INT ID:id EQ expr:e
+                {: RESULT = Stmt.define_int(id, e); :}
+            | FLOAT ID:id EQ expr:e
+                {: RESULT = Stmt.define_float(id, e); :}
+            | CHAR ID:id EQ expr:e
+                {: RESULT = Stmt.define_char(id, e); :}
+            | STRING ID:id EQ expr:e
+                {: RESULT = Stmt.define_string(id, e); :}
+            | BOOLEAN ID:id EQ expr:e
+                {: RESULT = Stmt.define_boolean(id, e); :};
+
+
+assign  ::= ID:id EQ expr:e
+                {: RESULT = Stmt.assign(id, e); :};
+
+ifthen      ::= IF expr:e LCURLY statement_list:sl RCURLY
+            {: RESULT = Stmt.ifthen(e, sl); :};
+
+
+ifelse      ::= IF expr:e LCURLY statement_list:sl RCURLY else_list:el
+            {:
+                RESULT = Stmt.ifelse(e, sl, el);
+            :};
+
+else_list   ::= else_list:el ELSE LCURLY statement_list:sl RCURLY
+                    {:
+                        ElseBlock block = new ElseBlock(sl);
+                        el.add(block);
+                        RESULT = el;
+                    :}
+                | else_list:el ELSEIF expr:e LCURLY statement_list:sl RCURLY
+                    {:
+                        ElseBlock block = new ElseBlock(e, sl);
+                        el.add(block);
+                        RESULT = el;
+                    :}
+                | ELSEIF expr:e LCURLY statement_list:sl RCURLY
+                    {:
+                        ElseBlock block = new ElseBlock(e, sl);
+                        ArrayList<ElseBlock> block_list;
+                        block_list = new ArrayList<ElseBlock>();
+                        block_list.add(block);
+                        RESULT = block_list;
+                    :}
+                | ELSE LCURLY statement_list:sl RCURLY
+                    {: 
+                        ElseBlock block = new ElseBlock(sl);
+                        ArrayList<ElseBlock> block_list;
+                        block_list = new ArrayList<ElseBlock>();
+                        block_list.add(block);
+                        RESULT = block_list;
+                    :};
+
+while       ::= WHILE expr:e LCURLY statement_list:sl RCURLY
+                    {:
+                        RESULT = Stmt.while_s(e, sl);
+                    :};
+
+dowhile     ::= DO LCURLY statement_list:sl RCURLY WHILE expr:e
+                    {:
+                        RESULT = Stmt.dowhile_s(e, sl);
+                    :};
+
+expr        ::= math:m
+                    {: RESULT = m; :}
+                | logic:l
+                    {: RESULT = l; :};
+
+math        ::= math:m PLUS factor:f
+                    {: RESULT = new Expr(m, f, sym.PLUS); :}
+                | math:m MINUS factor:f
+                    {: RESULT = new Expr(m, f, sym.MINUS); :}
+                | factor:f
+                    {: RESULT = f; :};
+
+
+factor      ::= factor:f TIMES term:t
+                    {: RESULT = new Expr(f, t, sym.TIMES); :}
+                | factor:f DIVIDE term:t
+                    {: RESULT = new Expr(f, t, sym.DIVIDE); :}
+                | factor:f MOD term:t
+                    {: RESULT = new Expr(f, t, sym.MOD); :}
+                | term:t
+                    {: RESULT = t; :};
+
+
+logic       ::= term:t1 AND term:t2
+                    {: RESULT = new Expr(t1, t2, sym.AND); :}
+                | term:t1 OR term:t2
+                    {: RESULT = new Expr(t1, t2, sym.OR); :}
+                | term:t1 LT term:t2
+                    {: RESULT = new Expr(t1, t2, sym.LT); :}
+                | term:t1 GT term:t2
+                    {: RESULT = new Expr(t1, t2, sym.GT); :}
+                | term:t1 LTE term:t2
+                    {: RESULT = new Expr(t1, t2, sym.LTE); :}
+                | term:t1 GTE term:t2
+                    {: RESULT = new Expr(t1, t2, sym.GTE); :}
+                | term:t1 EQUAL term:t2
+                    {: RESULT = new Expr(t1, t2, sym.EQUAL); :}
+                | term:t1 NOTEQUAL term:t2
+                    {: RESULT = new Expr(t1, t2, sym.NOTEQUAL); :};
+
+
+term        ::= zerm:z EXP term:t
+                    {: RESULT = new Expr(z, t, sym.EXP); :}
+                | zerm:z
+                    {: RESULT = z; :};
+
+
+zerm        ::= LPAREN expr:e RPAREN
+                    {: RESULT = e; :}
+                | INTEGER_LITERAL:i
+                    {: RESULT = new Expr(i); :}
+                | MINUS INTEGER_LITERAL:i
+                    {: RESULT = new Expr(-i); :}
+                | FLOAT_LITERAL:f
+                    {: RESULT = new Expr(f); :}
+                | MINUS FLOAT_LITERAL:f
+                    {: RESULT = new Expr(-f); :}
+                | CHAR_LITERAL:c
+                    {: RESULT = new Expr(c); :}
+                | STRING_LITERAL:s
+                    {: RESULT = new Expr(s); :}
+                | BOOLEAN_LITERAL:b
+                    {: RESULT = new Expr(b); :}
+                | ID:id
+                    {: RESULT = new Expr("id", id); :};
+*/
+

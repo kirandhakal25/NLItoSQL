@@ -1,0 +1,36 @@
+INT a = 1;
+FLOAT b = 2.3;
+CHAR c = 'c';
+STRING d = "Hello Everyone";
+BOOLEAN e = true;
+a =2;
+
+IF true { 
+    INT f = 2;
+    FLOAT g = 2.0;
+    PRINT "Hello everyone from the IF statement";
+ }
+ELSEIF true {
+    INT h = 3;
+    FLOAT i = 2.1;
+}
+ELSE {
+    CHAR j = 'j';
+    PRINT "HELLO everyone from the ELSE statement";
+};
+
+WHILE a<5{
+    PRINT "INSIDE WHILE STATEMENT";
+    PRINT a;
+    a = a+1;
+};
+
+DO {
+    PRINT "INSIDE DO WHILE STATEMENT";
+    PRINT a;
+    a = a+2;
+}WHILE a<10;
+
+
+a = a-1;
+

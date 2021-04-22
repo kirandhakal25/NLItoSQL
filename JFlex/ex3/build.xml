@@ -1,0 +1,72 @@
+
+<project name="ex1" default="compile" basedir=".">
+    <property name="cl"      location="cl"      />
+    <property name="cup"     location="cup"     />
+    <property name="flex"    location="flex"    />
+    <property name="src"     location="src"     />
+    <property name="java"    location="java"    />
+    <property name="classes" location="classes" />
+    <property name="dist"    location="dist"    />
+    <property name="lib"     location="../lib"     />
+    <property name="bin"     location="../bin"     />
+    <property environment="env" />
+
+  <!-- We rely on CUP-10k-TUM, JFlex 1.3.5 and Classgen 1.5pre -->
+  <!-- residing in our directory ``bin'' -->
+    <path id="binaries">
+        <pathelement location="${bin}" />
+        <fileset dir="${bin}">
+            <include name="**/*.jar" />
+            <include name="**/*.zip" />
+        </fileset>
+        <pathelement path="${java.class.path}" />
+        <pathelement path="${classes}" />
+    </path>
+
+    <path id="libraries">
+        <pathelement location="${lib}" />
+        <fileset dir="${lib}">
+            <include name="**/*.jar" />
+            <include name="**/*.zip" />
+        </fileset>
+        <pathelement path="${java.class.path}" />
+    </path>
+
+  <!-- This is JFlex -->
+    <taskdef name="jflex"
+           classname="JFlex.anttask.JFlexTask"
+           classpath="${bin}/JFlex.jar"
+  />
+  <!-- We have Classgen 1.5pre -->
+    <taskdef name="classgen"
+           classname="classgen.AntTask"
+           classpath="${bin}/classgen.jar"
+  />
+  <!-- We also use CUP-TUM -->
+    <taskdef name="cup"
+           classname="java_cup.anttask.CUPTask"
+           classpath="${bin}/java-cup-11a.jar"
+  />
+    <target name="run" depends="compile">
+        <java classname="PrintTokenStream">
+            <arg line="sample.inp"/>
+        </java>
+    </target>
+
+    <target name="compile" depends="jflex">
+        <javac srcdir="." destdir="."/>
+    </target>
+
+    <target name="jflex">
+        <jflex file="standalone.flex"/>
+    </target>
+
+    <target name="clean">
+        <delete file="PrintTokenStream.java"/>
+        <delete>
+            <fileset dir="." includes="**/*~"/>
+            <fileset dir="." includes="**/*.class"/>
+        </delete>
+    </target>
+
+</project>
